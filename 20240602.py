@@ -239,10 +239,16 @@ def main():
 
 
         stations, lines, fares = get_transfer_info(route_soup)
+
+        # 水野追加修正
+        route_info_df = pd.DataFrame({
+            '駅': stations,
+            '路線': lines,
+            '料金': fares
+        })
+    
         st.write("＜乗り換え情報＞")
-        for station, line, fare in zip(stations, lines, fares):
-            st.write(f"{station} | {line} {fare}")
-        st.write(stations[-1])
+        st.table(route_info_df)  # 追加修正ここまで
 
         st.write(f"URL(Yahoo!乗換案内)：{route_url}")
     # 追加ここまで
