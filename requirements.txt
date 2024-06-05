@@ -1,8 +1,8 @@
-streamlit
-pandas
 numpy
 gspread
 googlemaps
 folium
 requests
-gspread_dataframe==3.0.8
+streamlit==1.35.0
+pandas==2.2.2
+gspread-dataframe==3.2.1
