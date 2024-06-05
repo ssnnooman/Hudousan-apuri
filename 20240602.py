@@ -34,8 +34,7 @@ def toggle_show_all():
 # スプレッドシートからデータを読み込む関数
 def load_data_from_spreadsheet():
     # googleスプレッドシートの認証 jsonファイル読み込み(key値はGCPから取得)
-    SP_CREDENTIAL_FILE = PRIVATE_KEY_PATH
-
+    SP_CREDENTIAL_FILE = r"C:\Users\ssnow\Desktop\STEP3-1　不動産アプリ\orbital-outpost-423316-v9-1abc7995dce3.json"
     scopes = [
         'https://www.googleapis.com/auth/spreadsheets',
         'https://www.googleapis.com/auth/drive'
