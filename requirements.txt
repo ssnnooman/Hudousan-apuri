@@ -1,0 +1,8 @@
+os
+streamlit
+pandas
+nump
+gspread
+googlemaps
+folium
+requests
