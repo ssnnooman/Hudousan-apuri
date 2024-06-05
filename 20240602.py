@@ -20,7 +20,7 @@ load_dotenv()
 
 # 環境変数から認証情報を取得
 SPREADSHEET_ID ="1SPGg1Dnslu31zEWoRKBwJh4suE-Nl4LQmxU3fSQaLTU"   #ここはSPREDシートのURLを張る。
-PRIVATE_KEY_PATH = r"C:\Users\ssnow\Desktop\STEP3-1　不動産アプリ\orbital-outpost-423316-v9-1abc7995dce3.json"
+PRIVATE_KEY_PATH = r"./orbital-outpost-423316-v9-1abc7995dce3.json"
 SP_SHEET     = 'demo' # sheet名
 
 # セッション状態の初期化
@@ -34,7 +34,8 @@ def toggle_show_all():
 # スプレッドシートからデータを読み込む関数
 def load_data_from_spreadsheet():
     # googleスプレッドシートの認証 jsonファイル読み込み(key値はGCPから取得)
-    SP_CREDENTIAL_FILE = r"C:\Users\ssnow\Desktop\STEP3-1　不動産アプリ\orbital-outpost-423316-v9-1abc7995dce3.json"
+    SP_CREDENTIAL_FILE =  r"./orbital-outpost-423316-v9-1abc7995dce3.json"
+
     scopes = [
         'https://www.googleapis.com/auth/spreadsheets',
         'https://www.googleapis.com/auth/drive'
