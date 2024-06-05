@@ -1,6 +1,6 @@
 streamlit
 pandas
-nump
+numpy
 gspread
 googlemaps
 folium
