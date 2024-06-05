@@ -8,3 +8,4 @@ pandas==2.2.2
 gspread-dataframe==3.2.1
 gspread==4.0.1
 python-dotenv==0.19.2
+geopy==2.2.0
