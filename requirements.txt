@@ -5,3 +5,4 @@ gspread
 googlemaps
 folium
 requests
+gspread_dataframe==3.0.8
