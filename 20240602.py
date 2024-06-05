@@ -10,12 +10,11 @@ from dotenv import load_dotenv
 from geopy.geocoders import Nominatim
 import folium
 from streamlit_folium import folium_static
-
 # 以下、水野追加
 import requests
 from bs4 import BeautifulSoup
-# 追加ここまで
 
+# 追加ここまで
 # 環境変数の読み込み
 load_dotenv()
 
@@ -90,7 +89,7 @@ def create_map(filtered_df):
             <a href="{row['間取画像URL']}" target="_blank">間取り画像</a>
             """
             # HTMLをポップアップに設定
-            popup = folium.Popup(popup_html, max_width=400)
+            popup = folium.Popup(popup_html, max_width=0)
             folium.Marker(
                 [row['latitude'], row['longitude']],
                 popup=popup
@@ -123,7 +122,6 @@ def get_route_info(departure_station, destination_station):
 
     return required_time, transfer_count, fare, route_soup, route_url
 
-
 def get_transfer_info(route_soup):
     route_detail = route_soup.find("div", class_="routeDetail")
 
@@ -144,16 +142,14 @@ def get_transfer_info(route_soup):
         fares.append(fare.get_text().strip())
     return stations, lines, fares
 
-
 # 追加ここまで
-
 # メインのアプリケーション
 def main():
     df = load_data_from_spreadsheet()
     df = preprocess_dataframe(df)
 
     # StreamlitのUI要素（スライダー、ボタンなど）の各表示設定
-    st.title('賃貸物件情報の可視化')
+    st.title('賃貸物件　楽々検索アプリ')
 
     # エリアと家賃フィルタバーを1:2の割合で分割
     col1, col2 = st.columns([1, 2])
@@ -225,33 +221,52 @@ def main():
             display_search_results(st.session_state.get('filtered_df2', filtered_df2))  # 地図上の物件のみ
 
     # 以下、水野追加
+    route_information()
+# 追加ここまで
+
+# 以下、水野追加
+def route_information():
     departure_station = st.text_input("出発駅(例：新宿駅)")
     destination_station = st.text_input("到着駅(例：東京駅)")
 
-    if departure_station and destination_station:
-        required_time, transfer_count, fare, route_soup, route_url = get_route_info(departure_station, destination_station)
+    if st.button('検索'):
+        if departure_station and destination_station:
+            required_time, transfer_count, fare, route_soup, route_url = get_route_info(departure_station, destination_station)
 
+            route_info = {
+                "情報": ["所要時間", "乗換回数", "料金"],
+                "値": [required_time, transfer_count, fare]
+            }
 
-        st.write(f"＜{departure_station}から{destination_station}の路線情報＞")
-        st.write(f"所要時間　{required_time}")
-        st.write(f"乗換回数　{transfer_count}")
-        st.write(f"料金　　　{fare}")
+            route_info_df = pd.DataFrame(route_info)
 
+            st.write(f"＜{departure_station}から{destination_station}の路線情報＞")
+            st.table(route_info_df)
 
-        stations, lines, fares = get_transfer_info(route_soup)
+            stations, lines, fares = get_transfer_info(route_soup)
 
-        # 水野追加修正
-        route_info_df = pd.DataFrame({
-            '駅': stations,
-            '路線': lines,
-            '料金': fares
-        })
-    
-        st.write("＜乗り換え情報＞")
-        st.table(route_info_df)  # 追加修正ここまで
+            max_length = max(len(stations), len(lines), len(fares))
+            stations += [''] * (max_length - len(stations))
+            lines += [''] * (max_length - len(lines))
+            fares += [''] * (max_length - len(fares))
 
-        st.write(f"URL(Yahoo!乗換案内)：{route_url}")
-    # 追加ここまで
+            transfer_info = {
+                "駅": stations,
+                "路線": lines,
+                "料金": fares
+            }
+
+            transfer_info_df = pd.DataFrame(transfer_info)
+
+            st.write("＜乗り換え情報＞")
+            st.table(transfer_info_df)
+            st.write(stations[-1])
+
+            st.write(f"URL(Yahoo!乗換案内)：{route_url}")
+# # アプリケーションの実行
+# if __name__ == "__main__":
+
+#     # 追加ここまで
 
 # アプリケーションの実行
 if __name__ == "__main__":
@@ -261,21 +276,17 @@ if __name__ == "__main__":
         st.session_state['show_all'] = False
     main()
 
-    # APIキーを取得
-api_key = os.getenv('GOOGLE_API_KEY', 'AIzaSyBidhMkj1qM89EqMIUTykAMk-f-8kt3Uik')
-# 環境変数から取得、設定されていない場合は直接キーを指定
+# APIキーを取得
+api_key = os.getenv('GOOGLE_API_KEY', 'AIzaSyBidhMkj1qM89EqMIUTykAMk-f-8kt3Uik')  # 環境変数から取得、設定されていない場合は直接キーを指定
 
 # クライアントを作成
 gmaps = googlemaps.Client(key=api_key)
 
-# 三菱商事本社の緯度と経度
+# 東京駅の緯度と経度
 tokyo_station_coords = (35.6794, 139.7644)
 
 # 徒歩20分の距離をメートルに換算（約1.5km）
 radius = 1500
-
-# 周囲のジムを検索
-places_result = gmaps.places_nearby(location=tokyo_station_coords, radius=radius, type='gym')
 
 # 検索ボタン
 if st.sidebar.button("勤務地周辺のジム検索"):
@@ -284,11 +295,21 @@ if st.sidebar.button("勤務地周辺のジム検索"):
 
     # 結果を表示
     if places_result['results']:
-        st.write(f"から半径{radius / 1000}km以内のジム:")
+        st.write(f"東京駅から半径{radius / 1000}km以内のジム:")
+
+        # データフレーム用のリストを作成
+        gym_data = []
         for place in places_result['results']:
-            st.write(f"**Name:** {place['name']}")
-            st.write(f"**Address:** {place['vicinity']}")
-            st.write(f"**Rating:** {place.get('rating', 'No rating')}")
-            st.write("-" * 40)
+            gym_data.append({
+                "名前": place['name'],
+                "住所": place['vicinity'],
+                "評価": place.get('rating', 'No rating')
+            })
+
+        # データフレームを作成
+        gym_df = pd.DataFrame(gym_data)
+
+        # データフレームを表形式で表示
+        st.table(gym_df)
     else:
         st.write("ジムが見つかりませんでした。")
