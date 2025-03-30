@@ -277,7 +277,7 @@ if __name__ == "__main__":
     main()
 
 # APIキーを取得
-api_key = os.getenv('GOOGLE_API_KEY', 'AIzaSyBidhMkj1qM89EqMIUTykAMk-f-8kt3Uik')  # 環境変数から取得、設定されていない場合は直接キーを指定
+api_key = os.getenv('GOOGLE_API_KEY', '')  # 環境変数から取得、設定されていない場合は直接キーを指定
 
 # クライアントを作成
 gmaps = googlemaps.Client(key=api_key)
